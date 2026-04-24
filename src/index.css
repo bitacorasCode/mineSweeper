@@ -35,8 +35,8 @@
 .board {
   display: grid;
   border: 2px solid black;
-  background-color: lightgray;
-  gap: 1px;
+  background-color: rgb(131, 171, 182);
+  border-radius: 5px;
 }
 
 .action-buttons {
@@ -46,7 +46,8 @@
 }
 
 .clicked-cell {
-  background-color: rgba(30, 144, 255, 0.3);
+  background-color: rgb(131, 171, 182);
+  border: 0.5px solid rgb(1, 59, 75);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -55,8 +56,13 @@
 .cell-button {
   width: 100%;
   height: 100%;
-  background-color: dodgerblue;
-  box-shadow: inset gray 0px 0px 60px -12px;
+  background-color: rgb(19, 163, 203);
+  box-shadow: inset rgb(9, 101, 127) 0px 0px 30px;
+}
+
+.revealed-marked-cell {
+  position: absolute;
+  opacity: 0.5;
 }
 
 .flag-cursor {

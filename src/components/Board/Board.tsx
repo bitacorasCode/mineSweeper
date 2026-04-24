@@ -1,12 +1,11 @@
 import { useState } from 'react';
 
-import clearCells from '../../logic/clearCells';
-import generateBoard from '../../logic/generateBoard';
-import boardSettings from './board-settings';
+import gameDificult, { DificultLevels } from '../../config/gameSettings';
 import Cell from './Cell/Cell';
-import { DificultLevels } from './types';
+import clearCells from './logic/clearCells';
+import generateBoard from './logic/generateBoard';
 
-const initialBoard = generateBoard(boardSettings[DificultLevels.Easy]);
+const initialBoard = generateBoard(gameDificult[DificultLevels.Easy]);
 const cellWidth = 30;
 
 function Board() {
@@ -52,8 +51,10 @@ function Board() {
     }
   };
 
-  const handleResetClick = () => {
-    const newBoard = generateBoard(boardSettings[dificult]);
+  const handleResetBoard = (level: DificultLevels) => {
+    setDificult(level);
+
+    const newBoard = generateBoard(gameDificult[level]);
 
     setBoard(newBoard);
     setGameFinished(false);
@@ -76,38 +77,28 @@ function Board() {
     }
   };
 
-  const handleDificultClick = (level: DificultLevels) => {
-    setDificult(level);
-
-    const newBoard = generateBoard(boardSettings[level]);
-
-    setBoard(newBoard);
-    setGameFinished(false);
-    setMarkedBombs(0);
-  };
-
   return (
     <div className='mine-sweeper-container'>
       <div className='choose-dificult-section'>
         Choose dificult
         <div className='dificult-buttons'>
-          <button onClick={() => handleDificultClick(0)}>Easy</button>
-          <button onClick={() => handleDificultClick(1)}>Medium</button>
-          <button onClick={() => handleDificultClick(2)}>Hard</button>
+          <button onClick={() => handleResetBoard(0)}>Easy</button>
+          <button onClick={() => handleResetBoard(1)}>Medium</button>
+          <button onClick={() => handleResetBoard(2)}>Hard</button>
         </div>
       </div>
       <span>
-        Bombs revealed: {markedBombs} / {boardSettings[dificult].bombs}
+        Bombs revealed: {markedBombs} / {gameDificult[dificult].bombs}
       </span>
       <div className='board-buttons'>
         <button
-          className={`select-marker-button ${isFlagClicked && 'selected-button'}`}
+          className={`select-marker-button ${isFlagClicked ? 'selected-button' : ''}`}
           onClick={() => setIsFlagClicked(true)}
         >
           🚩
         </button>
         <button
-          className={`select-marker-button ${!isFlagClicked && 'selected-button'}`}
+          className={`select-marker-button ${!isFlagClicked ? 'selected-button' : ''}`}
           onClick={() => setIsFlagClicked(false)}
         >
           🔍
@@ -115,12 +106,12 @@ function Board() {
       </div>
 
       <section
-        className={`board ${isFlagClicked && 'flag-cursor'}`}
+        className='board'
         style={{
-          gridTemplateColumns: `repeat(${boardSettings[dificult].columns}, 1fr)`,
-          gridTemplateRows: `repeat(${boardSettings[dificult].rows}, 1fr)`,
-          width: cellWidth * boardSettings[dificult].columns + 'px',
-          height: cellWidth * boardSettings[dificult].rows + 'px',
+          gridTemplateColumns: `repeat(${gameDificult[dificult].columns}, 1fr)`,
+          gridTemplateRows: `repeat(${gameDificult[dificult].rows}, 1fr)`,
+          width: cellWidth * gameDificult[dificult].columns + 'px',
+          height: cellWidth * gameDificult[dificult].rows + 'px',
         }}
       >
         {board.cells
@@ -139,10 +130,10 @@ function Board() {
           .flat()}
       </section>
       <div className='action-buttons'>
-        <button onClick={handleResetClick}>Reset</button>
+        <button onClick={() => handleResetBoard(dificult)}>Reset</button>
         <button
           disabled={
-            markedBombs !== boardSettings[dificult].bombs || isGameFinished
+            markedBombs !== gameDificult[dificult].bombs || isGameFinished
           }
           onClick={finishGameHandler}
         >

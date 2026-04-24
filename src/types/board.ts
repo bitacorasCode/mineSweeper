@@ -3,6 +3,7 @@ export type Cell = {
     isRevealed: boolean;
     bombsAside: number;
     isMarked: boolean;
+    coords: { i: number, j: number }
 }
 
 export type Board = {

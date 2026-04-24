@@ -1,4 +1,4 @@
-import type { Cell } from "../../../types/board/board"
+import type { Cell } from "../../../types/board"
 
 export type CellProps = {
     cell: Cell,
