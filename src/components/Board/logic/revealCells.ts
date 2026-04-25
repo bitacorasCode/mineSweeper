@@ -1,8 +1,8 @@
 import { getNeighbors } from "../../../logic/getNeighbors";
 import type { Cell } from "../../../types/board"
 
-export default function clearCells(cells: Cell[][], rowIndex: number, columnIndex: number) {
-    const neighbors = getNeighbors(cells, rowIndex, columnIndex)
+export default function revealCells(cells: Cell[][], row: number, column: number) {
+    const neighbors = getNeighbors(cells, row, column)
 
     neighbors.forEach((cell) => {
         if (cell.isRevealed || cell.isBomb || cell.isMarked) return
@@ -12,7 +12,7 @@ export default function clearCells(cells: Cell[][], rowIndex: number, columnInde
         if (cell.bombsAside === 0 && !cell.isRevealed) {
             cell.isRevealed = true
 
-            clearCells(cells, i, j)
+            revealCells(cells, i, j)
         }
 
         else {

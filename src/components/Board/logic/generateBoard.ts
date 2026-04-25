@@ -26,7 +26,7 @@ export default function generateBoard({ columns, rows, bombs }: Pick<Board, 'col
         }
     }
 
-    const addBombsAside = (rowIndex: number, columnIndex: number) => {
+    const addBombsAsideQuantityToNeighbors = (rowIndex: number, columnIndex: number) => {
         const neighbors = getNeighbors(board.cells, rowIndex, columnIndex)
 
         neighbors.forEach((cell) => {
@@ -45,7 +45,7 @@ export default function generateBoard({ columns, rows, bombs }: Pick<Board, 'col
         if (!cell.isBomb) {
             cell.isBomb = true
 
-            addBombsAside(rowIndex, columnIndex)
+            addBombsAsideQuantityToNeighbors(rowIndex, columnIndex)
         } else {
             i--
         }

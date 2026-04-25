@@ -2,8 +2,8 @@ import { useState } from 'react';
 
 import gameDificult, { DificultLevels } from '../../config/gameSettings';
 import Cell from './Cell/Cell';
-import clearCells from './logic/clearCells';
 import generateBoard from './logic/generateBoard';
+import revealCells from './logic/revealCells';
 
 const initialBoard = generateBoard(gameDificult[DificultLevels.Easy]);
 const cellWidth = 30;
@@ -35,7 +35,7 @@ function Board() {
     } else cellCopy.isRevealed = true;
 
     if (cellCopy.bombsAside === 0 && !isFlagClicked) {
-      clearCells(cellsCopy, rowIndex, columnIndex);
+      revealCells(cellsCopy, rowIndex, columnIndex);
     }
 
     cellsCopy[rowIndex][columnIndex] = cellCopy;
