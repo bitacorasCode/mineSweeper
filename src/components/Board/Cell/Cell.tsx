@@ -1,9 +1,10 @@
+import { GameStatusEnum } from '../../../types/game';
 import type { CellProps } from './types';
 
 function Cell(props: CellProps) {
-  const { cell, coords, isFlagClicked, isGameFinished, onCellClick } = props;
+  const { cell, coords, isFlagClicked, gameStatus, onCellClick } = props;
 
-  return cell.isRevealed || isGameFinished ? (
+  return cell.isRevealed || gameStatus !== GameStatusEnum.Playing ? (
     <div
       className={`clicked-cell ${isFlagClicked ? 'flag-cursor' : 'pointer-cursor'}`}
     >

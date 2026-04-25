@@ -1,105 +1,60 @@
-import { useState } from 'react';
-
 import gameDificult, { DificultLevels } from '../../config/gameSettings';
+import { useMineSweeper } from '../../hooks/useMineSweeper';
+import { GameStatusEnum } from '../../types/game';
 import Cell from './Cell/Cell';
-import generateBoard from './logic/generateBoard';
-import revealCells from './logic/revealCells';
 
-const initialBoard = generateBoard(gameDificult[DificultLevels.Easy]);
 const cellWidth = 30;
 
 function Board() {
-  const [board, setBoard] = useState(initialBoard);
-  const [isGameFinished, setGameFinished] = useState(false);
-  const [isFlagClicked, setIsFlagClicked] = useState(false);
-  const [markedBombs, setMarkedBombs] = useState(0);
-  const [dificult, setDificult] = useState(DificultLevels.Easy);
-
-  const handleCellClick = (rowIndex: number, columnIndex: number) => {
-    if (isGameFinished) return;
-
-    const cell = board.cells[rowIndex][columnIndex];
-
-    if (cell.isRevealed || (!isFlagClicked && cell.isMarked)) return;
-
-    const boardCopy = { ...board };
-
-    const cellsCopy = [...board.cells].map((row) => [...row]);
-
-    const cellCopy = { ...cell };
-
-    if (isFlagClicked) {
-      cellCopy.isMarked = !cellCopy.isMarked;
-
-      setMarkedBombs((x) => (cellCopy.isMarked ? x + 1 : x - 1));
-    } else cellCopy.isRevealed = true;
-
-    if (cellCopy.bombsAside === 0 && !isFlagClicked) {
-      revealCells(cellsCopy, rowIndex, columnIndex);
-    }
-
-    cellsCopy[rowIndex][columnIndex] = cellCopy;
-
-    boardCopy.cells = cellsCopy;
-
-    setBoard(boardCopy);
-
-    if (cellCopy.isBomb && cellCopy.isRevealed) {
-      setTimeout(() => alert('explotaste'), 20);
-
-      setGameFinished(true);
-    }
-  };
-
-  const handleResetBoard = (level: DificultLevels) => {
-    setDificult(level);
-
-    const newBoard = generateBoard(gameDificult[level]);
-
-    setBoard(newBoard);
-    setGameFinished(false);
-    setMarkedBombs(0);
-  };
-
-  const finishGameHandler = () => {
-    const isGameWinned = !board.cells.some((row) =>
-      row.some((cell) => cell.isBomb && !cell.isMarked),
-    );
-
-    if (isGameWinned) {
-      setGameFinished(true);
-
-      alert('Ganaste!');
-    } else {
-      setGameFinished(true);
-
-      alert('Perdiste');
-    }
-  };
+  const {
+    board,
+    difficult,
+    markedBombs,
+    gameStatus,
+    isFlagMode,
+    resetBoard,
+    handleClickCell,
+    finishGame,
+    setIsFlagMode,
+  } = useMineSweeper();
 
   return (
     <div className='mine-sweeper-container'>
+      <div className='game-status'>
+        {gameStatus === GameStatusEnum.Playing && <span>Good Luck!</span>}
+        {gameStatus === GameStatusEnum.Won && (
+          <span className='status-won'>🎉 You Won!</span>
+        )}
+        {gameStatus === GameStatusEnum.Lost && (
+          <span className='status-lost'>💥 You Lost!</span>
+        )}
+      </div>
+
       <div className='choose-dificult-section'>
-        Choose dificult
+        Choose difficult:
         <div className='dificult-buttons'>
-          <button onClick={() => handleResetBoard(0)}>Easy</button>
-          <button onClick={() => handleResetBoard(1)}>Medium</button>
-          <button onClick={() => handleResetBoard(2)}>Hard</button>
+          <button onClick={() => resetBoard(DificultLevels.Easy)}>Easy</button>
+          <button onClick={() => resetBoard(DificultLevels.Medium)}>
+            Medium
+          </button>
+          <button onClick={() => resetBoard(DificultLevels.Hard)}>Hard</button>
         </div>
       </div>
+
       <span>
-        Bombs revealed: {markedBombs} / {gameDificult[dificult].bombs}
+        Bombs marked: {markedBombs} / {gameDificult[difficult].bombs}
       </span>
+
       <div className='board-buttons'>
         <button
-          className={`select-marker-button ${isFlagClicked ? 'selected-button' : ''}`}
-          onClick={() => setIsFlagClicked(true)}
+          className={`select-marker-button ${isFlagMode ? 'selected-button' : ''}`}
+          onClick={() => setIsFlagMode(true)}
         >
           🚩
         </button>
         <button
-          className={`select-marker-button ${!isFlagClicked ? 'selected-button' : ''}`}
-          onClick={() => setIsFlagClicked(false)}
+          className={`select-marker-button ${!isFlagMode ? 'selected-button' : ''}`}
+          onClick={() => setIsFlagMode(false)}
         >
           🔍
         </button>
@@ -108,19 +63,19 @@ function Board() {
       <section
         className='board'
         style={{
-          gridTemplateColumns: `repeat(${gameDificult[dificult].columns}, 1fr)`,
-          gridTemplateRows: `repeat(${gameDificult[dificult].rows}, 1fr)`,
-          width: cellWidth * gameDificult[dificult].columns + 'px',
-          height: cellWidth * gameDificult[dificult].rows + 'px',
+          gridTemplateColumns: `repeat(${gameDificult[difficult].columns}, 1fr)`,
+          gridTemplateRows: `repeat(${gameDificult[difficult].rows}, 1fr)`,
+          width: cellWidth * gameDificult[difficult].columns + 'px',
+          height: cellWidth * gameDificult[difficult].rows + 'px',
         }}
       >
         {board.cells
           .map((row, i) =>
             row.map((cell, j) => (
               <Cell
-                isGameFinished={isGameFinished}
-                isFlagClicked={isFlagClicked}
-                onCellClick={handleCellClick}
+                gameStatus={gameStatus}
+                isFlagClicked={isFlagMode}
+                onCellClick={handleClickCell}
                 coords={{ i, j }}
                 key={`${i}-${j}`}
                 cell={cell}
@@ -129,13 +84,12 @@ function Board() {
           )
           .flat()}
       </section>
+
       <div className='action-buttons'>
-        <button onClick={() => handleResetBoard(dificult)}>Reset</button>
+        <button onClick={() => resetBoard(difficult)}>Reset</button>
         <button
-          disabled={
-            markedBombs !== gameDificult[dificult].bombs || isGameFinished
-          }
-          onClick={finishGameHandler}
+          disabled={gameStatus !== GameStatusEnum.Playing}
+          onClick={finishGame}
         >
           Finish Game
         </button>

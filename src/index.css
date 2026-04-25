@@ -15,6 +15,20 @@
   background-color: rgba(187, 140, 140, 0.5);
 }
 
+.game-status {
+  font-size: 24px;
+  font-weight: bold;
+  height: 40px;
+}
+
+.status-won {
+  color: green;
+}
+
+.status-lost {
+  color: red;
+}
+
 .choose-dificult-section {
   display: flex;
   flex-direction: column;
