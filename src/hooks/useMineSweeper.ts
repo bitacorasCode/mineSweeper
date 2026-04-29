@@ -1,82 +1,45 @@
-import { useState } from 'react';
+import { useCallback } from 'react';
 
-import generateBoard from '../components/Board/logic/generateBoard';
-import revealCells from '../components/Board/logic/revealCells';
-import gameDificult, { DificultLevels } from '../config/gameSettings';
-import type { Board } from '../types/board';
-import { GameStatusEnum } from '../types/game';
+import { DificultLevels } from '../config/gameSettings';
+import { useBoardLogic } from './useBoardLogic';
+import { useGameState } from './useGameState';
 
 export function useMineSweeper() {
-    const [board, setBoard] = useState<Board>(
-        generateBoard(gameDificult[DificultLevels.Easy])
-    );
-    const [difficult, setDifficult] = useState(DificultLevels.Easy);
-    const [markedBombs, setMarkedBombs] = useState(0);
-    const [gameStatus, setGameStatus] = useState<GameStatusEnum>(GameStatusEnum.Playing);
-    const [isFlagMode, setIsFlagMode] = useState(false);
+    const gameState = useGameState();
+    const boardLogic = useBoardLogic(gameState.difficult);
 
-    const resetBoard = (level: DificultLevels) => {
-        setDifficult(level);
-        const newBoard = generateBoard(gameDificult[level]);
-        setBoard(newBoard);
-        setMarkedBombs(0);
-        setGameStatus(GameStatusEnum.Playing);
-    };
+    const resetBoard = useCallback((level: DificultLevels) => {
+        gameState.resetGame(level);
+        boardLogic.resetBoard(level);
+    }, [gameState, boardLogic]);
 
-    const handleClickCell = (rowIndex: number, columnIndex: number) => {
-        const cell = board.cells[rowIndex][columnIndex];
-
-        if (gameStatus !== GameStatusEnum.Playing || cell.isRevealed || (!isFlagMode && cell.isMarked)) return;
-
-        const cellsCopy = board.cells.map((row) => [...row]);
-        const cellCopy = { ...cell };
-
-        if (isFlagMode) {
-            cellCopy.isMarked = !cellCopy.isMarked;
-            setMarkedBombs((prev) => (cellCopy.isMarked ? prev + 1 : prev - 1));
-        } else {
-            cellCopy.isRevealed = true;
-
-            if (cellCopy.isBomb) {
-                setGameStatus(GameStatusEnum.Lost);
-                cellsCopy[rowIndex][columnIndex] = cellCopy;
-                setBoard({ ...board, cells: cellsCopy });
-                return;
-            }
-
-            if (cellCopy.bombsAside === 0) {
-                revealCells(cellsCopy, rowIndex, columnIndex);
-            }
-        }
-
-        cellsCopy[rowIndex][columnIndex] = cellCopy;
-        setBoard({ ...board, cells: cellsCopy });
-    };
-
-    const finishGame = () => {
-        const allBombsMarked = !board.cells.some((row) =>
-            row.some((cell) => cell.isBomb && !cell.isMarked),
+    const handleClickCell = useCallback((rowIndex: number, columnIndex: number) => {
+        boardLogic.handleClickCell(
+            rowIndex,
+            columnIndex,
+            gameState.isFlagMode,
+            gameState.gameStatus,
+            gameState.setGameLost
         );
-        const allSafeRevealed = !board.cells.some((row) =>
-            row.some((cell) => !cell.isBomb && !cell.isRevealed),
-        );
+    }, [boardLogic, gameState]);
 
-        if (allBombsMarked && allSafeRevealed) {
-            setGameStatus(GameStatusEnum.Won);
+    const finishGame = useCallback(() => {
+        if (boardLogic.checkWinCondition()) {
+            gameState.setGameWon();
         } else {
-            setGameStatus(GameStatusEnum.Lost);
+            gameState.setGameLost();
         }
-    };
+    }, [boardLogic, gameState]);
 
     return {
-        board,
-        difficult,
-        markedBombs,
-        gameStatus,
-        isFlagMode,
+        board: boardLogic.board,
+        difficult: gameState.difficult,
+        markedBombs: boardLogic.markedBombs,
+        gameStatus: gameState.gameStatus,
+        isFlagMode: gameState.isFlagMode,
         resetBoard,
         handleClickCell,
         finishGame,
-        setIsFlagMode,
+        setIsFlagMode: gameState.setIsFlagMode,
     };
 }

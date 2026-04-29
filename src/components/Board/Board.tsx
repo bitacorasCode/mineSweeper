@@ -1,9 +1,13 @@
 import gameDificult, { DificultLevels } from '../../config/gameSettings';
 import { useMineSweeper } from '../../hooks/useMineSweeper';
 import { GameStatusEnum } from '../../types/game';
+import Button from '../Button/Button';
 import Cell from './Cell/Cell';
 
 const cellWidth = 30;
+const gameDifficultEnumArray = Object.values(DificultLevels).filter(
+  (value) => typeof value === 'string',
+);
 
 function Board() {
   const {
@@ -17,6 +21,8 @@ function Board() {
     finishGame,
     setIsFlagMode,
   } = useMineSweeper();
+
+  const cursorClass = isFlagMode ? 'flag-cursor' : 'pointer-cursor';
 
   return (
     <div className='mine-sweeper-container'>
@@ -33,11 +39,15 @@ function Board() {
       <div className='choose-dificult-section'>
         Choose difficult:
         <div className='dificult-buttons'>
-          <button onClick={() => resetBoard(DificultLevels.Easy)}>Easy</button>
-          <button onClick={() => resetBoard(DificultLevels.Medium)}>
-            Medium
-          </button>
-          <button onClick={() => resetBoard(DificultLevels.Hard)}>Hard</button>
+          {gameDifficultEnumArray.map((level, i) => (
+            <Button
+              key={level}
+              variant={difficult === i ? 'primary' : 'secondary'}
+              onClick={() => resetBoard(i)}
+            >
+              {level}
+            </Button>
+          ))}
         </div>
       </div>
 
@@ -46,22 +56,24 @@ function Board() {
       </span>
 
       <div className='board-buttons'>
-        <button
-          className={`select-marker-button ${isFlagMode ? 'selected-button' : ''}`}
+        <Button
+          variant={isFlagMode ? 'primary' : 'outline'}
+          className={isFlagMode ? 'selected-button' : ''}
           onClick={() => setIsFlagMode(true)}
         >
           🚩
-        </button>
-        <button
-          className={`select-marker-button ${!isFlagMode ? 'selected-button' : ''}`}
+        </Button>
+        <Button
+          variant={!isFlagMode ? 'primary' : 'outline'}
+          className={!isFlagMode ? 'selected-button' : ''}
           onClick={() => setIsFlagMode(false)}
         >
           🔍
-        </button>
+        </Button>
       </div>
 
       <section
-        className='board'
+        className={`board ${cursorClass}`}
         style={{
           gridTemplateColumns: `repeat(${gameDificult[difficult].columns}, 1fr)`,
           gridTemplateRows: `repeat(${gameDificult[difficult].rows}, 1fr)`,
@@ -74,7 +86,6 @@ function Board() {
             row.map((cell, j) => (
               <Cell
                 gameStatus={gameStatus}
-                isFlagClicked={isFlagMode}
                 onCellClick={handleClickCell}
                 coords={{ i, j }}
                 key={`${i}-${j}`}
@@ -86,13 +97,16 @@ function Board() {
       </section>
 
       <div className='action-buttons'>
-        <button onClick={() => resetBoard(difficult)}>Reset</button>
-        <button
-          disabled={gameStatus !== GameStatusEnum.Playing}
+        <Button variant='secondary' onClick={() => resetBoard(difficult)}>
+          Reset
+        </Button>
+        <Button
+          variant='secondary'
           onClick={finishGame}
+          disabled={gameStatus !== GameStatusEnum.Playing}
         >
           Finish Game
-        </button>
+        </Button>
       </div>
     </div>
   );

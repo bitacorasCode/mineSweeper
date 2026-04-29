@@ -6,7 +6,6 @@ export enum DificultLevels {
     Hard,
 }
 
-
 const gameDificult: Record<DificultLevels, Pick<Board, 'columns' | 'rows' | 'bombs'>> = {
     [DificultLevels.Easy]: { columns: 8, rows: 8, bombs: 10 },
     [DificultLevels.Medium]: { columns: 12, rows: 12, bombs: 25 },
