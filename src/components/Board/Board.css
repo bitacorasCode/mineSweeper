@@ -1,0 +1,8 @@
+@import '../../styles/colors.css';
+
+.board {
+  display: grid;
+  border: 2px solid var(--color-border);
+  background-color: var(--color-primary-light);
+  border-radius: 5px;
+}

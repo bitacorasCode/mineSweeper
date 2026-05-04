@@ -1,0 +1,21 @@
+/* Color Variables */
+:root {
+  /* Primary Colors */
+  --color-primary: rgb(19, 163, 203);
+  --color-primary-dark: rgb(9, 101, 127);
+  --color-primary-light: rgb(131, 171, 182);
+
+  /* Neutral Colors */
+  --color-dark: rgb(5, 38, 51);
+  --color-dark-transparent: rgba(5, 38, 51, 0.15);
+  --color-background: rgba(187, 140, 140, 0.5);
+
+  /* Status Colors */
+  --color-success: #28a745;
+  --color-danger: #e43c36;
+
+  /* Border Colors */
+  --color-border: black;
+  --color-border-dark: rgb(1, 59, 75);
+  --color-border-highlight: rgb(48, 153, 233);
+}

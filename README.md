@@ -50,17 +50,22 @@ A classic Minesweeper game implemented in React with TypeScript and Vite. The go
 
 ```
 src/
+├── styles/
+│   └── colors.css                   # Color variables and theme
 ├── components/
 │   ├── Board/
 │   │   ├── Board.tsx                # Main board container
+│   │   ├── Board.css                # Board styles
 │   │   ├── Cell/
 │   │   │   ├── Cell.tsx             # Individual cell component
+│   │   │   ├── Cell.css             # Cell styles
 │   │   │   └── types.ts             # Cell prop types
 │   │   └── logic/
 │   │       ├── generateBoard.ts     # Board generation
 │   │       └── revealCells.ts       # Recursive cell reveal logic
 │   └── Button/
 │       ├── Button.tsx               # Reusable button component
+│       ├── Button.css               # Button styles
 │       └── types.ts                 # Button prop types
 ├── config/
 │   └── gameSettings.ts              # Game difficulty levels configuration
@@ -74,8 +79,9 @@ src/
 │   ├── board.ts                     # Board and cell types
 │   └── game.ts                      # Game status enum
 ├── App.tsx                          # Root component
+├── App.css                          # App container styles
 ├── main.tsx                         # Vite entry point
-└── index.css                        # Global styles
+└── index.css                        # Global styles and imports
 ```
 
 ## Contributing
